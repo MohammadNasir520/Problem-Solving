@@ -24,7 +24,7 @@ sample input/output for quick validation.
     <td colspan="2"><sub>Feb</sub></td>
     <td colspan="5"><sub>Mar</sub></td>
     <td colspan="4"><sub>Apr</sub></td>
-    <td colspan="1">May</td>
+    <td colspan="1"></td>
   </tr>
   <tr>
     <td align="right"><sub>Mon&nbsp;</sub></td>
