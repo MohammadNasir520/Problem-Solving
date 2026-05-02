@@ -120,7 +120,7 @@ Each day lives in a folder named `dayX/`:
     <td><a href="#" title="April 10, 2026">⬜</a></td>
     <td><a href="#" title="April 17, 2026">⬜</a></td>
     <td><a href="#" title="April 24, 2026">⬜</a></td>
-    <td><a href="https://github.com/MohammadNasir520/problem-solving/tree/main/day1" title="May 01, 2026">🟩</a></td>
+    <td><a href="https://github.com/MohammadNasir520/Problem-Solving/tree/main/day1" title="May 01, 2026">🟩</a></td>
   </tr>
   <tr>
     <td align="right"><sub>Sat&nbsp;</sub></td>
@@ -150,7 +150,7 @@ Each day lives in a folder named `dayX/`:
     <td><a href="#" title="April 12, 2026">⬜</a></td>
     <td><a href="#" title="April 19, 2026">⬜</a></td>
     <td><a href="#" title="April 26, 2026">⬜</a></td>
-    <td><a href="#" title="May 03, 2026">⬜</a></td>
+    <td></td>
   </tr>
 </table>
 <!-- SUMMARY:END -->
@@ -166,16 +166,16 @@ Each day lives in a folder named `dayX/`:
 ---
 
 <!-- DAILY-LOG:START -->
-Last updated: 03 May 2026
+Last updated: 02 May 2026
 
 | Day | Folder | Problem | Input | Output |
 | :-: | ------ | ------- | :---: | :----: |
-| [Day 1 - 01:05:2026](https://github.com/MohammadNasir520/problem-solving/tree/main/day1) | - | - | - | - | - |
-|  | [118A](https://github.com/MohammadNasir520/problem-solving/tree/main/day1%2F118A) | [118A](https://codeforces.com/problemset/problem/118/A) | [input.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1%2F118A%2Finput.txt) | [output.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1%2F118A%2Foutput.txt) |
-|  | [158A](https://github.com/MohammadNasir520/problem-solving/tree/main/day1%2F158A) | [158A](https://codeforces.com/problemset/problem/158/A) | [input.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1%2F158A%2Finput.txt) | [output.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1%2F158A%2Foutput.txt) |
-|  | [231A](https://github.com/MohammadNasir520/problem-solving/tree/main/day1%2F231A) | [231A](https://codeforces.com/problemset/problem/231/A) | [input.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1%2F231A%2Finput.txt) | [output.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1%2F231A%2Foutput.txt) |
-|  | [4A](https://github.com/MohammadNasir520/problem-solving/tree/main/day1%2F4A) | [4A](https://codeforces.com/problemset/problem/4/A) | [input.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1%2F4A%2Finput.txt) | [output.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1%2F4A%2Foutput.txt) |
-|  | [71A](https://github.com/MohammadNasir520/problem-solving/tree/main/day1%2F71A) | [71A](https://codeforces.com/problemset/problem/71/A) | [input.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1%2F71A%2Finput.txt) | [output.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1%2F71A%2Foutput.txt) |
+| [Day 1 - 01:05:2026](https://github.com/MohammadNasir520/Problem-Solving/tree/main/day1) | - | - | - | - | - |
+|  | [118A](https://github.com/MohammadNasir520/Problem-Solving/tree/main/day1%2F118A) | [118A](https://codeforces.com/problemset/problem/118/A) | [input.txt](https://github.com/MohammadNasir520/Problem-Solving/blob/main/day1%2F118A%2Finput.txt) | [output.txt](https://github.com/MohammadNasir520/Problem-Solving/blob/main/day1%2F118A%2Foutput.txt) |
+|  | [158A](https://github.com/MohammadNasir520/Problem-Solving/tree/main/day1%2F158A) | [158A](https://codeforces.com/problemset/problem/158/A) | [input.txt](https://github.com/MohammadNasir520/Problem-Solving/blob/main/day1%2F158A%2Finput.txt) | [output.txt](https://github.com/MohammadNasir520/Problem-Solving/blob/main/day1%2F158A%2Foutput.txt) |
+|  | [231A](https://github.com/MohammadNasir520/Problem-Solving/tree/main/day1%2F231A) | [231A](https://codeforces.com/problemset/problem/231/A) | [input.txt](https://github.com/MohammadNasir520/Problem-Solving/blob/main/day1%2F231A%2Finput.txt) | [output.txt](https://github.com/MohammadNasir520/Problem-Solving/blob/main/day1%2F231A%2Foutput.txt) |
+|  | [4A](https://github.com/MohammadNasir520/Problem-Solving/tree/main/day1%2F4A) | [4A](https://codeforces.com/problemset/problem/4/A) | [input.txt](https://github.com/MohammadNasir520/Problem-Solving/blob/main/day1%2F4A%2Finput.txt) | [output.txt](https://github.com/MohammadNasir520/Problem-Solving/blob/main/day1%2F4A%2Foutput.txt) |
+|  | [71A](https://github.com/MohammadNasir520/Problem-Solving/tree/main/day1%2F71A) | [71A](https://codeforces.com/problemset/problem/71/A) | [input.txt](https://github.com/MohammadNasir520/Problem-Solving/blob/main/day1%2F71A%2Finput.txt) | [output.txt](https://github.com/MohammadNasir520/Problem-Solving/blob/main/day1%2F71A%2Foutput.txt) |
 <!-- DAILY-LOG:END -->
 
 
