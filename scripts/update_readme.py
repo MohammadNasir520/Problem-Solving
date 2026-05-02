@@ -2,6 +2,7 @@
 import datetime
 import os
 import re
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -83,6 +84,19 @@ def build_rows() -> list[str]:
 def parse_date(date_str: str) -> datetime.date:
     d, m, y = date_str.split(":")
     return datetime.date(int(y), int(m), int(d))
+
+
+def git_active_dates() -> set[datetime.date]:
+    result = subprocess.run(
+        ["git", "log", "--format=%ad", "--date=short"],
+        cwd=ROOT, capture_output=True, text=True,
+    )
+    dates = set()
+    for line in result.stdout.splitlines():
+        line = line.strip()
+        if line:
+            dates.add(datetime.date.fromisoformat(line))
+    return dates
 
 
 def compute_streaks(active_dates: set) -> tuple[int, int]:
@@ -178,9 +192,34 @@ def activity_svg(active_dates: set) -> str:
 
 
 def activity_grid(active_dates: set) -> str:
+    today = datetime.date.today()
+    weeks = build_weeks()
+
     svg = activity_svg(active_dates)
     SVG_FILE.write_text(svg, encoding="utf-8")
-    return '<img src="activity.svg" alt="Activity grid">'
+
+    # image map: one <area> per cell with title for hover tooltip
+    areas = []
+    for i, week in enumerate(weeks):
+        for dow, day in enumerate(week):
+            if day > today:
+                continue
+            x1 = LEFT_PAD + i * STEP
+            y1 = TOP_PAD + dow * STEP
+            x2 = x1 + CELL
+            y2 = y1 + CELL
+            title = day.strftime("%B %d, %Y")
+            areas.append(
+                f'  <area shape="rect" coords="{x1},{y1},{x2},{y2}" title="{title}" alt="{title}">'
+            )
+
+    lines = [
+        '<img src="activity.svg" usemap="#activity-map" alt="Activity grid">',
+        '<map name="activity-map">',
+        *areas,
+        "</map>",
+    ]
+    return "\n".join(lines)
 
 
 def render_summary() -> str:
@@ -188,6 +227,7 @@ def render_summary() -> str:
     total = len(entries)
     cf_count = sum(1 for e in entries if CF_URL_RE.search(e["url"]))
 
+    # activity grid driven by problem-solved folder dates
     active_dates = {parse_date(e["date_str"]) for e in entries}
     days_active = len(active_dates)
     current_streak, longest_streak = compute_streaks(active_dates)
