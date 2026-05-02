@@ -109,62 +109,78 @@ def compute_streaks(active_dates: set) -> tuple[int, int]:
     return streak, longest
 
 
-def activity_grid(active_dates: set) -> str:
+SVG_FILE = ROOT / "activity.svg"
+
+CELL = 11   # px
+GAP  = 2    # px
+STEP = CELL + GAP
+LEFT_PAD = 28  # space for day labels
+TOP_PAD  = 18  # space for month labels
+COLOR_ACTIVE   = "#26a641"
+COLOR_INACTIVE = "#ebedf0"
+COLOR_LABEL    = "#57606a"
+
+
+def build_weeks() -> list[list[datetime.date]]:
     today = datetime.date.today()
-    # align grid start to the Monday 11 weeks back (12 weeks total)
-    days_since_monday = today.weekday()
-    start = today - datetime.timedelta(days=days_since_monday + 7 * 11)
-
-    # build columns (each column = one week, Mon→Sun)
-    weeks: list[list[datetime.date]] = []
-    cursor = start
-    while cursor <= today:
-        week = [cursor + datetime.timedelta(days=i) for i in range(7)]
-        weeks.append(week)
+    start = today - datetime.timedelta(days=today.weekday() + 7 * 11)
+    weeks, cursor = [], start
+    while cursor <= datetime.date.today():
+        weeks.append([cursor + datetime.timedelta(days=i) for i in range(7)])
         cursor += datetime.timedelta(weeks=1)
+    return weeks
 
-    # month label: show new month name on the column where day 1 of that month falls
-    col_labels: list[str | None] = []
-    for week in weeks:
-        label = None
+
+def activity_svg(active_dates: set) -> str:
+    today = datetime.date.today()
+    weeks = build_weeks()
+    n = len(weeks)
+    width  = LEFT_PAD + n * STEP + GAP
+    height = TOP_PAD + 7 * STEP + GAP
+    font = "10px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+
+    lines = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}">',
+        f'  <style>text {{ font: {font}; fill: {COLOR_LABEL}; }}</style>',
+    ]
+
+    # month labels — appear on the column where the 1st of the month falls
+    seen_months: set = set()
+    for i, week in enumerate(weeks):
         for day in week:
-            if day <= today and day.day == 1:
-                label = day.strftime("%b")
+            if day <= today and day.day == 1 and day.month not in seen_months:
+                x = LEFT_PAD + i * STEP
+                lines.append(f'  <text x="{x}" y="12">{day.strftime("%b")}</text>')
+                seen_months.add(day.month)
                 break
-        col_labels.append(label)
-    # seed first column with its month if no day-1 landed there
-    if col_labels and col_labels[0] is None:
-        col_labels[0] = weeks[0][0].strftime("%b")
 
-    # collapse into (label, colspan) spans
-    month_spans: list[list] = []
-    for label in col_labels:
-        if label is None:
-            month_spans[-1][1] += 1
-        else:
-            month_spans.append([label, 1])
+    # day labels — all 7 days
+    for dow, label in enumerate(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]):
+        y = TOP_PAD + dow * STEP + CELL
+        lines.append(f'  <text x="0" y="{y}" text-anchor="start">{label}</text>')
 
-    day_names = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
-    rows = ['<table cellspacing="2" cellpadding="0">', "  <tr>", '    <td width="20"></td>']
-    for label, span in month_spans:
-        rows.append(f'    <td colspan="{span}" align="center"><sub><b>{label}</b></sub></td>')
-    rows.append("  </tr>")
-
-    for dow in range(7):
-        rows.append("  <tr>")
-        rows.append(f'    <td align="right"><sub><b>{day_names[dow]}</b></sub></td>')
-        for week in weeks:
-            day = week[dow]
+    # cells
+    for i, week in enumerate(weeks):
+        for dow, day in enumerate(week):
             if day > today:
-                rows.append('    <td width="16" height="16"></td>')
-            else:
-                title = day.strftime("%B %d, %Y")
-                square = "🟩" if day in active_dates else "⬜"
-                rows.append(f'    <td width="16" height="16" title="{title}">{square}</td>')
-        rows.append("  </tr>")
+                continue
+            x = LEFT_PAD + i * STEP
+            y = TOP_PAD + dow * STEP
+            color = COLOR_ACTIVE if day in active_dates else COLOR_INACTIVE
+            title = day.strftime("%B %d, %Y")
+            lines.append(
+                f'  <rect x="{x}" y="{y}" width="{CELL}" height="{CELL}" rx="2" ry="2" fill="{color}">'
+                f'<title>{title}</title></rect>'
+            )
 
-    rows.append("</table>")
-    return "\n".join(rows)
+    lines.append("</svg>")
+    return "\n".join(lines)
+
+
+def activity_grid(active_dates: set) -> str:
+    svg = activity_svg(active_dates)
+    SVG_FILE.write_text(svg, encoding="utf-8")
+    return '<img src="activity.svg" alt="Activity grid">'
 
 
 def render_summary() -> str:
