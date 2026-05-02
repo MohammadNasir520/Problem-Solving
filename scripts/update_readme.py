@@ -123,32 +123,44 @@ def activity_grid(active_dates: set) -> str:
         weeks.append(week)
         cursor += datetime.timedelta(weeks=1)
 
-    # build month colspan spans for the header row
-    month_spans: list[tuple[str, int]] = []
+    # month label: show new month name on the column where day 1 of that month falls
+    col_labels: list[str | None] = []
     for week in weeks:
-        label = week[0].strftime("%b %Y")
-        if month_spans and month_spans[-1][0] == label:
-            month_spans[-1] = (label, month_spans[-1][1] + 1)
+        label = None
+        for day in week:
+            if day <= today and day.day == 1:
+                label = day.strftime("%b")
+                break
+        col_labels.append(label)
+    # seed first column with its month if no day-1 landed there
+    if col_labels and col_labels[0] is None:
+        col_labels[0] = weeks[0][0].strftime("%b")
+
+    # collapse into (label, colspan) spans
+    month_spans: list[list] = []
+    for label in col_labels:
+        if label is None:
+            month_spans[-1][1] += 1
         else:
-            month_spans.append((label, 1))
+            month_spans.append([label, 1])
 
     day_names = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
-    rows = ["<table>", "  <tr>", "    <td></td>"]
+    rows = ['<table cellspacing="2" cellpadding="0">', "  <tr>", '    <td width="20"></td>']
     for label, span in month_spans:
-        rows.append(f'    <td colspan="{span}"><b>{label}</b></td>')
+        rows.append(f'    <td colspan="{span}" align="center"><sub><b>{label}</b></sub></td>')
     rows.append("  </tr>")
 
     for dow in range(7):
         rows.append("  <tr>")
-        rows.append(f"    <td><b>{day_names[dow]}</b></td>")
+        rows.append(f'    <td align="right"><sub><b>{day_names[dow]}</b></sub></td>')
         for week in weeks:
             day = week[dow]
             if day > today:
-                rows.append("    <td></td>")
+                rows.append('    <td width="16" height="16"></td>')
             else:
                 title = day.strftime("%B %d, %Y")
                 square = "🟩" if day in active_dates else "⬜"
-                rows.append(f'    <td title="{title}">{square}</td>')
+                rows.append(f'    <td width="16" height="16" title="{title}">{square}</td>')
         rows.append("  </tr>")
 
     rows.append("</table>")
