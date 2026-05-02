@@ -118,7 +118,7 @@ Each day lives in a folder named `dayX-DD:MM:YYYY/`:
     <td><a href="#" title="April 10, 2026">⬜</a></td>
     <td><a href="#" title="April 17, 2026">⬜</a></td>
     <td><a href="#" title="April 24, 2026">⬜</a></td>
-    <td><a href="https://github.com/MohammadNasir520/problem-solving/tree/main/day1-01%3A05%3A2026" title="May 01, 2026">🟩</a></td>
+    <td><a href="https://github.com/MohammadNasir520/Problem-Solving/tree/main/day1-01%3A05%3A2026" title="May 01, 2026">🟩</a></td>
   </tr>
   <tr>
     <td align="right"><sub>Sat&nbsp;</sub></td>
@@ -168,7 +168,7 @@ Last updated: 02 May 2026
 
 | Day | Date | Problem | Solution | Input | Output |
 | :-: | :--: | ------- | -------- | :---: | :----: |
-| [Day 1](https://github.com/MohammadNasir520/problem-solving/tree/main/day1-01%3A05%3A2026) | 01:05:2026 | [231A](https://codeforces.com/problemset/problem/231/A) | [231A.cpp](https://github.com/MohammadNasir520/problem-solving/blob/main/day1-01%3A05%3A2026%2F231A.cpp) | [input.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1-01%3A05%3A2026%2Finput.txt) | [output.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1-01%3A05%3A2026%2Foutput.txt) |
+| [Day 1](https://github.com/MohammadNasir520/Problem-Solving/tree/main/day1-01%3A05%3A2026) | 01:05:2026 | [231A](https://codeforces.com/problemset/problem/231/A) | [231A.cpp](https://github.com/MohammadNasir520/Problem-Solving/blob/main/day1-01%3A05%3A2026%2F231A.cpp) | [input.txt](https://github.com/MohammadNasir520/Problem-Solving/blob/main/day1-01%3A05%3A2026%2Finput.txt) | [output.txt](https://github.com/MohammadNasir520/Problem-Solving/blob/main/day1-01%3A05%3A2026%2Foutput.txt) |
 <!-- DAILY-LOG:END -->
 
 
