@@ -14,15 +14,21 @@ END_MARKER = "<!-- DAILY-LOG:END -->"
 SUMMARY_START = "<!-- SUMMARY:START -->"
 SUMMARY_END = "<!-- SUMMARY:END -->"
 
-DAY_DIR_RE = re.compile(r"^day(\d+)-(\d{2}:\d{2}:\d{4})$")
+DAY_DIR_RE = re.compile(r"^day(\d+)$")
 CF_URL_RE = re.compile(r"codeforces\.com/problemset/problem/(\d+)/([A-Z]\d*)", re.IGNORECASE)
 
 
-def read_question(day_dir: Path) -> str:
-    question_path = day_dir / "question.txt"
+def read_question(question_path: Path) -> str:
     if not question_path.exists():
         return "N/A"
     return question_path.read_text(encoding="utf-8").strip() or "N/A"
+
+
+def read_day_date(day_dir: Path) -> str:
+    date_path = day_dir / "date.txt"
+    if not date_path.exists():
+        return "N/A"
+    return date_path.read_text(encoding="utf-8").strip() or "N/A"
 
 
 def problem_cell(url: str) -> str:
@@ -50,24 +56,26 @@ def build_entries() -> list[dict]:
         if not match:
             continue
         day_num = int(match.group(1))
-        date_str = match.group(2)
-        url = read_question(entry)
-        solutions = sorted(entry.glob("*.cpp"))
-        solution = solutions[0].relative_to(ROOT).as_posix() if solutions else "N/A"
-        input_file = entry / "input.txt"
-        output_file = entry / "output.txt"
-        input_path = input_file.relative_to(ROOT).as_posix() if input_file.exists() else "N/A"
-        output_path = output_file.relative_to(ROOT).as_posix() if output_file.exists() else "N/A"
-        entries.append({
-            "day_num": day_num,
-            "date_str": date_str,
-            "url": url,
-            "solution": solution,
-            "input_path": input_path,
-            "output_path": output_path,
-            "folder": entry.name,
-        })
-    entries.sort(key=lambda e: e["day_num"])
+        date_str = read_day_date(entry)
+        for problem_dir in sorted(entry.iterdir()):
+            if not problem_dir.is_dir():
+                continue
+            code = problem_dir.name
+            solution_file = problem_dir / f"{code}.cpp"
+            question_path = problem_dir / "question.txt"
+            input_file = problem_dir / "input.txt"
+            output_file = problem_dir / "output.txt"
+            entries.append({
+                "day_num": day_num,
+                "date_str": date_str,
+                "url": read_question(question_path),
+                "solution": solution_file.relative_to(ROOT).as_posix() if solution_file.exists() else "N/A",
+                "input_path": input_file.relative_to(ROOT).as_posix() if input_file.exists() else "N/A",
+                "output_path": output_file.relative_to(ROOT).as_posix() if output_file.exists() else "N/A",
+                "folder": entry.name,
+                "code": code,
+            })
+    entries.sort(key=lambda e: (e["day_num"], e["code"]))
     return entries
 
 
@@ -80,20 +88,35 @@ def gh_url(path: str, kind: str, base: str) -> str:
 def build_rows() -> list[str]:
     base = get_github_base_url()
     rows = []
-    for e in build_entries():
-        folder_url = gh_url(e["folder"], "tree", base) if base else f"{e['folder']}/"
-        folder_link = f"[Day {e['day_num']}]({folder_url})"
+    entries = build_entries()
+    grouped: dict[int, dict] = {}
+    for e in entries:
+        if e["day_num"] not in grouped:
+            grouped[e["day_num"]] = {
+                "date_str": e["date_str"],
+                "folder": e["folder"],
+                "items": [],
+            }
+        grouped[e["day_num"]]["items"].append(e)
 
-        def file_link(path: str) -> str:
-            if path == "N/A":
-                return "N/A"
-            url = gh_url(path, "blob", base) if base else path
-            return f"[{Path(path).name}]({url})"
-
-        rows.append(
-            f"| {folder_link} | {e['date_str']} | {problem_cell(e['url'])} "
-            f"| {file_link(e['solution'])} | {file_link(e['input_path'])} | {file_link(e['output_path'])} |"
-        )
+    for day_num in sorted(grouped.keys()):
+        group = grouped[day_num]
+        folder_url = gh_url(group["folder"], "tree", base) if base else f"{group['folder']}/"
+        day_label = f"Day {day_num} - {group['date_str']}"
+        day_link = f"[{day_label}]({folder_url})"
+        rows.append(f"| {day_link} | - | - | - | - | - |")
+        for item in group["items"]:
+            problem_path = f"{group['folder']}/{item['code']}"
+            problem_url = gh_url(problem_path, "tree", base) if base else f"{problem_path}/"
+            problem_link = problem_cell(item["url"])
+            input_path = f"{problem_path}/input.txt"
+            output_path = f"{problem_path}/output.txt"
+            input_url = gh_url(input_path, "blob", base) if base else input_path
+            output_url = gh_url(output_path, "blob", base) if base else output_path
+            rows.append(
+                f"|  | [{item['code']}]({problem_url}) | {problem_link} "
+                f"| [input.txt]({input_url}) | [output.txt]({output_url}) |"
+            )
     return rows
 
 
@@ -130,7 +153,6 @@ def git_active_dates() -> set[datetime.date]:
 def compute_streaks(active_dates: set) -> tuple[int, int]:
     if not active_dates:
         return 0, 0
-    today = datetime.date.today()
     sorted_dates = sorted(active_dates)
 
     longest = current = 1
@@ -141,8 +163,8 @@ def compute_streaks(active_dates: set) -> tuple[int, int]:
         else:
             current = 1
 
-    # current streak: start from today, or yesterday if today has no activity yet
-    cursor = today if today in active_dates else today - datetime.timedelta(days=1)
+    # current streak: count backward from the latest active date
+    cursor = sorted_dates[-1]
     streak = 0
     while cursor in active_dates:
         streak += 1
@@ -277,7 +299,7 @@ def render_summary() -> str:
     cf_count = sum(1 for e in entries if CF_URL_RE.search(e["url"]))
 
     # activity grid driven by folder dates (one green square per day you solved problems)
-    active_dates = {parse_date(e["date_str"]) for e in entries}
+    active_dates = {parse_date(e["date_str"]) for e in entries if e["date_str"] != "N/A"}
     days_active = len(active_dates)
     current_streak, longest_streak = compute_streaks(active_dates)
 
@@ -285,6 +307,8 @@ def render_summary() -> str:
     base = get_github_base_url()
     date_to_folder: dict = {}
     for e in entries:
+        if e["date_str"] == "N/A":
+            continue
         d = parse_date(e["date_str"])
         if d not in date_to_folder:
             encoded = quote(e["folder"], safe="")
@@ -307,14 +331,14 @@ def render_log() -> str:
     rows = build_rows()
     total = len(rows)
     if not rows:
-        rows = ["| - | - | - | - | - | - |"]
+        rows = ["| - | - | - | - | - |"]
 
     header = [
         START_MARKER,
         f"Last updated: {today}",
         "",
-        "| Day | Date | Problem | Solution | Input | Output |",
-        "| :-: | :--: | ------- | -------- | :---: | :----: |",
+        "| Day | Folder | Problem | Input | Output |",
+        "| :-: | ------ | ------- | :---: | :----: |",
     ]
     footer = [END_MARKER]
     return "\n".join(header + rows + footer)

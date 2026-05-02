@@ -19,14 +19,16 @@ My solutions may not always be the best — but they're genuine, and I'm improvi
 
 ## Structure
 
-Each day lives in a folder named `dayX-DD:MM:YYYY/`:
+Each day lives in a folder named `dayX/`:
 
-| File | Purpose |
+| Path | Purpose |
 | ---- | ------- |
-| `question.txt` | Problem URL or full description |
-| `*.cpp` | Solution code |
-| `input.txt` | Sample input |
-| `output.txt` | Expected output |
+| `dayX/date.txt` | Day date in `DD:MM:YYYY` format |
+| `dayX/<code>/` | One folder per problem (e.g., `day1/118A/`) |
+| `dayX/<code>/<code>.cpp` | Solution code |
+| `dayX/<code>/question.txt` | Problem URL or full description |
+| `dayX/<code>/input.txt` | Sample input |
+| `dayX/<code>/output.txt` | Expected output |
 
 ---
 
@@ -35,7 +37,7 @@ Each day lives in a folder named `dayX-DD:MM:YYYY/`:
 <!-- SUMMARY:START -->
 | 📝 Total Solved | 📅 Days Active | 🔥 Current Streak | ⚡ Longest Streak | 🏷️ Codeforces |
 | :------------: | :-----------: | :---------------: | :---------------: | :-----------: |
-| 1 | 1 | 1 days | 1 days | 1 |
+| 5 | 1 | 1 days | 1 days | 5 |
 
 <table border="0" cellspacing="2" cellpadding="0">
   <tr>
@@ -118,7 +120,7 @@ Each day lives in a folder named `dayX-DD:MM:YYYY/`:
     <td><a href="#" title="April 10, 2026">⬜</a></td>
     <td><a href="#" title="April 17, 2026">⬜</a></td>
     <td><a href="#" title="April 24, 2026">⬜</a></td>
-    <td><a href="https://github.com/MohammadNasir520/Problem-Solving/tree/main/day1-01%3A05%3A2026" title="May 01, 2026">🟩</a></td>
+    <td><a href="https://github.com/MohammadNasir520/problem-solving/tree/main/day1" title="May 01, 2026">🟩</a></td>
   </tr>
   <tr>
     <td align="right"><sub>Sat&nbsp;</sub></td>
@@ -148,7 +150,7 @@ Each day lives in a folder named `dayX-DD:MM:YYYY/`:
     <td><a href="#" title="April 12, 2026">⬜</a></td>
     <td><a href="#" title="April 19, 2026">⬜</a></td>
     <td><a href="#" title="April 26, 2026">⬜</a></td>
-    <td></td>
+    <td><a href="#" title="May 03, 2026">⬜</a></td>
   </tr>
 </table>
 <!-- SUMMARY:END -->
@@ -164,11 +166,16 @@ Each day lives in a folder named `dayX-DD:MM:YYYY/`:
 ---
 
 <!-- DAILY-LOG:START -->
-Last updated: 02 May 2026
+Last updated: 03 May 2026
 
-| Day | Date | Problem | Solution | Input | Output |
-| :-: | :--: | ------- | -------- | :---: | :----: |
-| [Day 1](https://github.com/MohammadNasir520/Problem-Solving/tree/main/day1-01%3A05%3A2026) | 01:05:2026 | [231A](https://codeforces.com/problemset/problem/231/A) | [231A.cpp](https://github.com/MohammadNasir520/Problem-Solving/blob/main/day1-01%3A05%3A2026%2F231A.cpp) | [input.txt](https://github.com/MohammadNasir520/Problem-Solving/blob/main/day1-01%3A05%3A2026%2Finput.txt) | [output.txt](https://github.com/MohammadNasir520/Problem-Solving/blob/main/day1-01%3A05%3A2026%2Foutput.txt) |
+| Day | Folder | Problem | Input | Output |
+| :-: | ------ | ------- | :---: | :----: |
+| [Day 1 - 01:05:2026](https://github.com/MohammadNasir520/problem-solving/tree/main/day1) | - | - | - | - | - |
+|  | [118A](https://github.com/MohammadNasir520/problem-solving/tree/main/day1%2F118A) | [118A](https://codeforces.com/problemset/problem/118/A) | [input.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1%2F118A%2Finput.txt) | [output.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1%2F118A%2Foutput.txt) |
+|  | [158A](https://github.com/MohammadNasir520/problem-solving/tree/main/day1%2F158A) | [158A](https://codeforces.com/problemset/problem/158/A) | [input.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1%2F158A%2Finput.txt) | [output.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1%2F158A%2Foutput.txt) |
+|  | [231A](https://github.com/MohammadNasir520/problem-solving/tree/main/day1%2F231A) | [231A](https://codeforces.com/problemset/problem/231/A) | [input.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1%2F231A%2Finput.txt) | [output.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1%2F231A%2Foutput.txt) |
+|  | [4A](https://github.com/MohammadNasir520/problem-solving/tree/main/day1%2F4A) | [4A](https://codeforces.com/problemset/problem/4/A) | [input.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1%2F4A%2Finput.txt) | [output.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1%2F4A%2Foutput.txt) |
+|  | [71A](https://github.com/MohammadNasir520/problem-solving/tree/main/day1%2F71A) | [71A](https://codeforces.com/problemset/problem/71/A) | [input.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1%2F71A%2Finput.txt) | [output.txt](https://github.com/MohammadNasir520/problem-solving/blob/main/day1%2F71A%2Foutput.txt) |
 <!-- DAILY-LOG:END -->
 
 
