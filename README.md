@@ -1,15 +1,29 @@
+<div align="center">
+
 # Problem Solving Log
 
-Daily problem-solving practice with clean, focused solutions and organized
-references. Each day captures the challenge link, the implemented solution, and
-sample input/output for quick validation.
+Daily competitive programming practice — clean solutions, organized by day.
+
+![C++](https://img.shields.io/badge/C%2B%2B-17-blue?style=flat-square&logo=c%2B%2B)&nbsp;
+![Codeforces](https://img.shields.io/badge/Platform-Codeforces-1F8ACB?style=flat-square)&nbsp;
+![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square)
+
+</div>
+
+---
 
 ## Structure
 
-- dayX-<date>/
-	- question.txt (problem URL or or full question explanation in text)
-	- problem_name.cpp (solution [code])
-	- input.txt / output.txt (sample I/O)
+Each day lives in a folder named `dayX-DD:MM:YYYY/`:
+
+| File | Purpose |
+| ---- | ------- |
+| `question.txt` | Problem URL or full description |
+| `*.cpp` | Solution code |
+| `input.txt` | Sample input |
+| `output.txt` | Expected output |
+
+---
 
 ## Summary
 
@@ -132,10 +146,14 @@ sample input/output for quick validation.
     <td></td>
   </tr>
 </table>
+<!-- SUMMARY:END -->
+
+---
 
 <div align="center">
   <h2>Daily Log</h2>
-  <p><sub>A running record of every problem solved, every day.<br>Consistency beats intensity &nbsp;·&nbsp; One solve at a time.</sub></p>
+  <sub>A running record of every problem solved, every day.<br>
+  Consistency beats intensity &nbsp;·&nbsp; One solve at a time.</sub>
 </div>
 
 ---
