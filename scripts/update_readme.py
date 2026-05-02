@@ -191,7 +191,7 @@ def activity_svg(active_dates: set) -> str:
     return "\n".join(lines)
 
 
-def activity_grid(active_dates: set) -> str:
+def activity_grid(active_dates: set, date_to_folder=None) -> str:
     today = datetime.date.today()
     weeks = build_weeks()
 
@@ -229,11 +229,14 @@ def activity_grid(active_dates: set) -> str:
         for week in weeks:
             day = week[dow]
             if day > today:
-                rows.append(f'    <td width="13" height="13"></td>')
+                rows.append('    <td></td>')
             else:
-                color = COLOR_ACTIVE if day in active_dates else COLOR_INACTIVE
                 title = day.strftime("%B %d, %Y")
-                rows.append(f'    <td width="13" height="13" bgcolor="{color}" title="{title}"></td>')
+                if day in active_dates:
+                    folder = date_to_folder.get(day, "#") if date_to_folder else "#"
+                    rows.append(f'    <td><a href="{folder}" title="{title}">🟩</a></td>')
+                else:
+                    rows.append(f'    <td><a href="#" title="{title}">⬜</a></td>')
         rows.append("  </tr>")
 
     rows.append("</table>")
@@ -250,13 +253,20 @@ def render_summary() -> str:
     days_active = len(active_dates)
     current_streak, longest_streak = compute_streaks(active_dates)
 
+    # map each active date to its first matching day folder (for click links)
+    date_to_folder: dict = {}
+    for e in entries:
+        d = parse_date(e["date_str"])
+        if d not in date_to_folder:
+            date_to_folder[d] = e["folder"] + "/"
+
     stats = "\n".join([
         f"| 📝 Total Solved | 📅 Days Active | 🔥 Current Streak | ⚡ Longest Streak | 🏷️ Codeforces |",
         f"| :------------: | :-----------: | :---------------: | :---------------: | :-----------: |",
         f"| {total} | {days_active} | {current_streak} days | {longest_streak} days | {cf_count} |",
     ])
 
-    grid = activity_grid(active_dates)
+    grid = activity_grid(active_dates, date_to_folder)
 
     lines = [SUMMARY_START, stats, "", grid, SUMMARY_END]
     return "\n".join(lines)
