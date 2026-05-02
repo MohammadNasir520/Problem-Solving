@@ -71,13 +71,28 @@ def build_entries() -> list[dict]:
     return entries
 
 
+def gh_url(path: str, kind: str, base: str) -> str:
+    """Return a full GitHub URL for a file (blob) or folder (tree)."""
+    encoded = quote(path, safe="")
+    return f"{base}/{kind}/main/{encoded}"
+
+
 def build_rows() -> list[str]:
+    base = get_github_base_url()
     rows = []
     for e in build_entries():
-        folder_link = f"[Day {e['day_num']}]({e['folder']}/)"
+        folder_url = gh_url(e["folder"], "tree", base) if base else f"{e['folder']}/"
+        folder_link = f"[Day {e['day_num']}]({folder_url})"
+
+        def file_link(path: str) -> str:
+            if path == "N/A":
+                return "N/A"
+            url = gh_url(path, "blob", base) if base else path
+            return f"[{Path(path).name}]({url})"
+
         rows.append(
             f"| {folder_link} | {e['date_str']} | {problem_cell(e['url'])} "
-            f"| {as_link(e['solution'])} | {as_link(e['input_path'])} | {as_link(e['output_path'])} |"
+            f"| {file_link(e['solution'])} | {file_link(e['input_path'])} | {file_link(e['output_path'])} |"
         )
     return rows
 
@@ -85,6 +100,18 @@ def build_rows() -> list[str]:
 def parse_date(date_str: str) -> datetime.date:
     d, m, y = date_str.split(":")
     return datetime.date(int(y), int(m), int(d))
+
+
+def get_github_base_url() -> str:
+    result = subprocess.run(
+        ["git", "remote", "get-url", "origin"],
+        cwd=ROOT, capture_output=True, text=True,
+    )
+    url = result.stdout.strip()
+    match = re.search(r"github\.com[:/](.+?)(?:\.git)?$", url)
+    if match:
+        return f"https://github.com/{match.group(1)}"
+    return ""
 
 
 def git_active_dates() -> set[datetime.date]:
@@ -234,8 +261,7 @@ def activity_grid(active_dates: set, date_to_folder=None) -> str:
             else:
                 title = day.strftime("%B %d, %Y")
                 if day in active_dates:
-                    raw = date_to_folder.get(day, "") if date_to_folder else ""
-                    href = quote(raw, safe="/") if raw else "#"
+                    href = date_to_folder.get(day, "#") if date_to_folder else "#"
                     rows.append(f'    <td><a href="{href}" title="{title}">🟩</a></td>')
                 else:
                     rows.append(f'    <td><a href="#" title="{title}">⬜</a></td>')
@@ -250,17 +276,19 @@ def render_summary() -> str:
     total = len(entries)
     cf_count = sum(1 for e in entries if CF_URL_RE.search(e["url"]))
 
-    # activity grid driven by git push dates
-    active_dates = git_active_dates()
+    # activity grid driven by folder dates (one green square per day you solved problems)
+    active_dates = {parse_date(e["date_str"]) for e in entries}
     days_active = len(active_dates)
     current_streak, longest_streak = compute_streaks(active_dates)
 
-    # map each active date to its first matching day folder (for click links)
+    # map each active date to a full GitHub tree URL for that day's folder
+    base = get_github_base_url()
     date_to_folder: dict = {}
     for e in entries:
         d = parse_date(e["date_str"])
         if d not in date_to_folder:
-            date_to_folder[d] = e["folder"] + "/"
+            encoded = quote(e["folder"], safe="")
+            date_to_folder[d] = f"{base}/tree/main/{encoded}" if base else "#"
 
     stats = "\n".join([
         f"| 📝 Total Solved | 📅 Days Active | 🔥 Current Streak | ⚡ Longest Streak | 🏷️ Codeforces |",
