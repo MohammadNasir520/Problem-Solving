@@ -80,18 +80,99 @@ def build_rows() -> list[str]:
     return rows
 
 
+def parse_date(date_str: str) -> datetime.date:
+    d, m, y = date_str.split(":")
+    return datetime.date(int(y), int(m), int(d))
+
+
+def compute_streaks(active_dates: set) -> tuple[int, int]:
+    if not active_dates:
+        return 0, 0
+    today = datetime.date.today()
+    sorted_dates = sorted(active_dates)
+
+    longest = current = 1
+    for i in range(1, len(sorted_dates)):
+        if (sorted_dates[i] - sorted_dates[i - 1]).days == 1:
+            current += 1
+            longest = max(longest, current)
+        else:
+            current = 1
+
+    # current streak: start from today, or yesterday if today has no activity yet
+    cursor = today if today in active_dates else today - datetime.timedelta(days=1)
+    streak = 0
+    while cursor in active_dates:
+        streak += 1
+        cursor -= datetime.timedelta(days=1)
+
+    return streak, longest
+
+
+def activity_grid(active_dates: set) -> str:
+    today = datetime.date.today()
+    # align grid start to the Monday 11 weeks back (12 weeks total)
+    days_since_monday = today.weekday()
+    start = today - datetime.timedelta(days=days_since_monday + 7 * 11)
+
+    # build columns (each column = one week, Mon→Sun)
+    weeks: list[list[datetime.date]] = []
+    cursor = start
+    while cursor <= today:
+        week = [cursor + datetime.timedelta(days=i) for i in range(7)]
+        weeks.append(week)
+        cursor += datetime.timedelta(weeks=1)
+
+    # build month colspan spans for the header row
+    month_spans: list[tuple[str, int]] = []
+    for week in weeks:
+        label = week[0].strftime("%b %Y")
+        if month_spans and month_spans[-1][0] == label:
+            month_spans[-1] = (label, month_spans[-1][1] + 1)
+        else:
+            month_spans.append((label, 1))
+
+    day_names = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
+    rows = ["<table>", "  <tr>", "    <td></td>"]
+    for label, span in month_spans:
+        rows.append(f'    <td colspan="{span}"><b>{label}</b></td>')
+    rows.append("  </tr>")
+
+    for dow in range(7):
+        rows.append("  <tr>")
+        rows.append(f"    <td><b>{day_names[dow]}</b></td>")
+        for week in weeks:
+            day = week[dow]
+            if day > today:
+                rows.append("    <td></td>")
+            else:
+                title = day.strftime("%B %d, %Y")
+                square = "🟩" if day in active_dates else "⬜"
+                rows.append(f'    <td title="{title}">{square}</td>')
+        rows.append("  </tr>")
+
+    rows.append("</table>")
+    return "\n".join(rows)
+
+
 def render_summary() -> str:
     entries = build_entries()
     total = len(entries)
-    days_active = len({e["date_str"] for e in entries})
     cf_count = sum(1 for e in entries if CF_URL_RE.search(e["url"]))
-    lines = [
-        SUMMARY_START,
-        f"| Total Problems Solved | Days Active | Codeforces Problems |",
-        f"| :-------------------: | :---------: | :-----------------: |",
-        f"| {total} | {days_active} | {cf_count} |",
-        SUMMARY_END,
-    ]
+
+    active_dates = {parse_date(e["date_str"]) for e in entries}
+    days_active = len(active_dates)
+    current_streak, longest_streak = compute_streaks(active_dates)
+
+    stats = "\n".join([
+        f"| 📝 Total Solved | 📅 Days Active | 🔥 Current Streak | ⚡ Longest Streak | 🏷️ Codeforces |",
+        f"| :------------: | :-----------: | :---------------: | :---------------: | :-----------: |",
+        f"| {total} | {days_active} | {current_streak} days | {longest_streak} days | {cf_count} |",
+    ])
+
+    grid = activity_grid(active_dates)
+
+    lines = [SUMMARY_START, stats, "", grid, SUMMARY_END]
     return "\n".join(lines)
 
 
