@@ -14,12 +14,12 @@ sample input/output for quick validation.
 ## Daily Log
 
 <!-- DAILY-LOG:START -->
-Last updated: 2026-05-02
+**Total problems solved: 2** &nbsp;|&nbsp; Last updated: 02 May 2026
 
 | Day | Date | Problem | Solution | Input | Output |
-| --- | ---- | ------- | -------- | ----- | ------ |
-| day1 | 01:05:2026 | [https://codeforces.com/problemset/problem/231/A](https://codeforces.com/problemset/problem/231/A) | [day1-01:05:2026/231A.cpp](day1-01:05:2026/231A.cpp) | [day1-01:05:2026/input.txt](day1-01:05:2026/input.txt) | [day1-01:05:2026/output.txt](day1-01:05:2026/output.txt) |
-| day2 | 01:05:2026 | [https://codeforces.com/problemset/problem/231/A](https://codeforces.com/problemset/problem/231/A) | [day2-01:05:2026/231A.cpp](day2-01:05:2026/231A.cpp) | [day2-01:05:2026/input.txt](day2-01:05:2026/input.txt) | [day2-01:05:2026/output.txt](day2-01:05:2026/output.txt) |
+| :-: | :--: | ------- | -------- | :---: | :----: |
+| [Day 1](day1-01:05:2026/) | 01:05:2026 | [231A](https://codeforces.com/problemset/problem/231/A) | [231A.cpp](day1-01:05:2026/231A.cpp) | [input.txt](day1-01:05:2026/input.txt) | [output.txt](day1-01:05:2026/output.txt) |
+| [Day 2](day2-01:05:2026/) | 01:05:2026 | [Problem](test) | [any.cpp](day2-01:05:2026/any.cpp) | [input.txt](day2-01:05:2026/input.txt) | [output.txt](day2-01:05:2026/output.txt) |
 <!-- DAILY-LOG:END -->
 
 
