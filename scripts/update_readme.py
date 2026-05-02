@@ -9,6 +9,8 @@ README = ROOT / "README.md"
 
 START_MARKER = "<!-- DAILY-LOG:START -->"
 END_MARKER = "<!-- DAILY-LOG:END -->"
+SUMMARY_START = "<!-- SUMMARY:START -->"
+SUMMARY_END = "<!-- SUMMARY:END -->"
 
 DAY_DIR_RE = re.compile(r"^day(\d+)-(\d{2}:\d{2}:\d{4})$")
 CF_URL_RE = re.compile(r"codeforces\.com/problemset/problem/(\d+)/([A-Z]\d*)", re.IGNORECASE)
@@ -24,6 +26,8 @@ def read_question(day_dir: Path) -> str:
 def problem_cell(url: str) -> str:
     if url == "N/A":
         return "N/A"
+    if not url.startswith("http"):
+        return url
     match = CF_URL_RE.search(url)
     if match:
         name = f"{match.group(1)}{match.group(2)}"
@@ -35,8 +39,8 @@ def as_link(path: str) -> str:
     return f"[{Path(path).name}]({path})" if path != "N/A" else "N/A"
 
 
-def build_rows() -> list[str]:
-    rows = []
+def build_entries() -> list[dict]:
+    entries = []
     for entry in sorted(ROOT.iterdir()):
         if not entry.is_dir():
             continue
@@ -52,15 +56,43 @@ def build_rows() -> list[str]:
         output_file = entry / "output.txt"
         input_path = input_file.relative_to(ROOT).as_posix() if input_file.exists() else "N/A"
         output_path = output_file.relative_to(ROOT).as_posix() if output_file.exists() else "N/A"
+        entries.append({
+            "day_num": day_num,
+            "date_str": date_str,
+            "url": url,
+            "solution": solution,
+            "input_path": input_path,
+            "output_path": output_path,
+            "folder": entry.name,
+        })
+    entries.sort(key=lambda e: e["day_num"])
+    return entries
 
-        folder_link = f"[Day {day_num}]({entry.name}/)"
-        rows.append((
-            day_num,
-            f"| {folder_link} | {date_str} | {problem_cell(url)} | {as_link(solution)} | {as_link(input_path)} | {as_link(output_path)} |",
-        ))
 
-    rows.sort(key=lambda r: r[0])
-    return [row for _, row in rows]
+def build_rows() -> list[str]:
+    rows = []
+    for e in build_entries():
+        folder_link = f"[Day {e['day_num']}]({e['folder']}/)"
+        rows.append(
+            f"| {folder_link} | {e['date_str']} | {problem_cell(e['url'])} "
+            f"| {as_link(e['solution'])} | {as_link(e['input_path'])} | {as_link(e['output_path'])} |"
+        )
+    return rows
+
+
+def render_summary() -> str:
+    entries = build_entries()
+    total = len(entries)
+    days_active = len({e["date_str"] for e in entries})
+    cf_count = sum(1 for e in entries if CF_URL_RE.search(e["url"]))
+    lines = [
+        SUMMARY_START,
+        f"| Total Problems Solved | Days Active | Codeforces Problems |",
+        f"| :-------------------: | :---------: | :-----------------: |",
+        f"| {total} | {days_active} | {cf_count} |",
+        SUMMARY_END,
+    ]
+    return "\n".join(lines)
 
 
 def render_log() -> str:
@@ -72,7 +104,7 @@ def render_log() -> str:
 
     header = [
         START_MARKER,
-        f"**Total problems solved: {total}** &nbsp;|&nbsp; Last updated: {today}",
+        f"Last updated: {today}",
         "",
         "| Day | Date | Problem | Solution | Input | Output |",
         "| :-: | :--: | ------- | -------- | :---: | :----: |",
@@ -86,11 +118,19 @@ def update_readme() -> None:
     if START_MARKER not in content or END_MARKER not in content:
         raise SystemExit("Daily log markers not found in README.md")
 
-    pattern = re.compile(
+    log_pattern = re.compile(
         re.escape(START_MARKER) + r".*?" + re.escape(END_MARKER),
         re.DOTALL,
     )
-    new_content = pattern.sub(render_log(), content)
+    new_content = log_pattern.sub(render_log(), content)
+
+    if SUMMARY_START in new_content and SUMMARY_END in new_content:
+        summary_pattern = re.compile(
+            re.escape(SUMMARY_START) + r".*?" + re.escape(SUMMARY_END),
+            re.DOTALL,
+        )
+        new_content = summary_pattern.sub(render_summary(), new_content)
+
     README.write_text(new_content, encoding="utf-8")
 
 

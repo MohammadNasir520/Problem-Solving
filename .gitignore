@@ -1,3 +1,8 @@
 .vscode
 *.json
 .DS_Store
+
+# ignore all files inside day directories except source and I/O files
+day*-*/*
+!day*-*/*.cpp
+!day*-*/*.txt
