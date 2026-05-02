@@ -4,6 +4,11 @@
 
 Daily competitive programming practice — clean solutions, organized by day.
 
+<p><em>Every solution here is written independently — no AI-generated code, no copied answers.<br>
+AI serves as a learning companion: to understand concepts, clarify doubts, and deepen insight —<br>
+never to write the solution. Honesty in practice is the only way growth is real.<br>
+My solutions may not always be the best — but they're genuine, and I'm improving every day.</em></p>
+
 ![C++](https://img.shields.io/badge/C%2B%2B-17-blue?style=flat-square&logo=c%2B%2B)&nbsp;
 ![Codeforces](https://img.shields.io/badge/Platform-Codeforces-1F8ACB?style=flat-square)&nbsp;
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square)
