@@ -11,20 +11,28 @@ START_MARKER = "<!-- DAILY-LOG:START -->"
 END_MARKER = "<!-- DAILY-LOG:END -->"
 
 DAY_DIR_RE = re.compile(r"^day(\d+)-(\d{2}:\d{2}:\d{4})$")
+CF_URL_RE = re.compile(r"codeforces\.com/problemset/problem/(\d+)/([A-Z]\d*)", re.IGNORECASE)
 
 
-def read_problem_link(day_dir: Path) -> str:
+def read_question(day_dir: Path) -> str:
     question_path = day_dir / "question.txt"
     if not question_path.exists():
         return "N/A"
-    content = question_path.read_text(encoding="utf-8").strip()
-    return content or "N/A"
+    return question_path.read_text(encoding="utf-8").strip() or "N/A"
 
 
-def as_link(text: str, target: str) -> str:
-    if text == "N/A" or target == "N/A":
+def problem_cell(url: str) -> str:
+    if url == "N/A":
         return "N/A"
-    return f"[{text}]({target})"
+    match = CF_URL_RE.search(url)
+    if match:
+        name = f"{match.group(1)}{match.group(2)}"
+        return f"[{name}]({url})"
+    return f"[Problem]({url})"
+
+
+def as_link(path: str) -> str:
+    return f"[{Path(path).name}]({path})" if path != "N/A" else "N/A"
 
 
 def build_rows() -> list[str]:
@@ -37,7 +45,7 @@ def build_rows() -> list[str]:
             continue
         day_num = int(match.group(1))
         date_str = match.group(2)
-        problem = read_problem_link(entry)
+        url = read_question(entry)
         solutions = sorted(entry.glob("*.cpp"))
         solution = solutions[0].relative_to(ROOT).as_posix() if solutions else "N/A"
         input_file = entry / "input.txt"
@@ -45,35 +53,31 @@ def build_rows() -> list[str]:
         input_path = input_file.relative_to(ROOT).as_posix() if input_file.exists() else "N/A"
         output_path = output_file.relative_to(ROOT).as_posix() if output_file.exists() else "N/A"
 
-        problem_cell = as_link(problem, problem) if problem.startswith("http") else problem
-        solution_cell = as_link(solution, solution)
-        input_cell = as_link(input_path, input_path)
-        output_cell = as_link(output_path, output_path)
-
-        rows.append(
-            (
-                day_num,
-                f"| day{day_num} | {date_str} | {problem_cell} | {solution_cell} | {input_cell} | {output_cell} |",
-            )
-        )
+        folder_link = f"[Day {day_num}]({entry.name}/)"
+        rows.append((
+            day_num,
+            f"| {folder_link} | {date_str} | {problem_cell(url)} | {as_link(solution)} | {as_link(input_path)} | {as_link(output_path)} |",
+        ))
 
     rows.sort(key=lambda r: r[0])
     return [row for _, row in rows]
 
 
 def render_log() -> str:
-    today = datetime.date.today().isoformat()
-    header = [
-        f"{START_MARKER}",
-        f"Last updated: {today}",
-        "",
-        "| Day | Date | Problem | Solution | Input | Output |",
-        "| --- | ---- | ------- | -------- | ----- | ------ |",
-    ]
+    today = datetime.date.today().strftime("%d %b %Y")
     rows = build_rows()
+    total = len(rows)
     if not rows:
         rows = ["| - | - | - | - | - | - |"]
-    footer = [f"{END_MARKER}"]
+
+    header = [
+        START_MARKER,
+        f"**Total problems solved: {total}** &nbsp;|&nbsp; Last updated: {today}",
+        "",
+        "| Day | Date | Problem | Solution | Input | Output |",
+        "| :-: | :--: | ------- | -------- | :---: | :----: |",
+    ]
+    footer = [END_MARKER]
     return "\n".join(header + rows + footer)
 
 
