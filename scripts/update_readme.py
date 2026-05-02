@@ -195,31 +195,49 @@ def activity_grid(active_dates: set) -> str:
     today = datetime.date.today()
     weeks = build_weeks()
 
-    svg = activity_svg(active_dates)
-    SVG_FILE.write_text(svg, encoding="utf-8")
+    col_labels: list[str | None] = []
+    for week in weeks:
+        label = None
+        for day in week:
+            if day <= today and day.day == 1:
+                label = day.strftime("%b")
+                break
+        col_labels.append(label)
+    if col_labels and col_labels[0] is None:
+        col_labels[0] = weeks[0][0].strftime("%b")
 
-    # image map: one <area> per cell with title for hover tooltip
-    areas = []
-    for i, week in enumerate(weeks):
-        for dow, day in enumerate(week):
+    month_spans: list[list] = []
+    for label in col_labels:
+        if label is None:
+            month_spans[-1][1] += 1
+        else:
+            month_spans.append([label, 1])
+
+    day_names = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    rows = ['<table border="0" cellspacing="2" cellpadding="0">']
+
+    rows.append("  <tr>")
+    rows.append('    <td width="28"></td>')
+    for label, span in month_spans:
+        text = f"<sub>{label}</sub>" if span >= 2 else ""
+        rows.append(f'    <td colspan="{span}">{text}</td>')
+    rows.append("  </tr>")
+
+    for dow, name in enumerate(day_names):
+        rows.append("  <tr>")
+        rows.append(f'    <td align="right"><sub>{name}&nbsp;</sub></td>')
+        for week in weeks:
+            day = week[dow]
             if day > today:
-                continue
-            x1 = LEFT_PAD + i * STEP
-            y1 = TOP_PAD + dow * STEP
-            x2 = x1 + CELL
-            y2 = y1 + CELL
-            title = day.strftime("%B %d, %Y")
-            areas.append(
-                f'  <area shape="rect" coords="{x1},{y1},{x2},{y2}" title="{title}" alt="{title}">'
-            )
+                rows.append(f'    <td width="13" height="13"></td>')
+            else:
+                color = COLOR_ACTIVE if day in active_dates else COLOR_INACTIVE
+                title = day.strftime("%B %d, %Y")
+                rows.append(f'    <td width="13" height="13" bgcolor="{color}" title="{title}"></td>')
+        rows.append("  </tr>")
 
-    lines = [
-        '<img src="activity.svg" usemap="#activity-map" alt="Activity grid">',
-        '<map name="activity-map">',
-        *areas,
-        "</map>",
-    ]
-    return "\n".join(lines)
+    rows.append("</table>")
+    return "\n".join(rows)
 
 
 def render_summary() -> str:
@@ -227,8 +245,8 @@ def render_summary() -> str:
     total = len(entries)
     cf_count = sum(1 for e in entries if CF_URL_RE.search(e["url"]))
 
-    # activity grid driven by problem-solved folder dates
-    active_dates = {parse_date(e["date_str"]) for e in entries}
+    # activity grid driven by git push dates
+    active_dates = git_active_dates()
     days_active = len(active_dates)
     current_streak, longest_streak = compute_streaks(active_dates)
 
